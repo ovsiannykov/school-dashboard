@@ -1,0 +1,59 @@
+{
+  "env": {
+    "browser": true,
+    "node": true,
+    "es2021": true
+  },
+  "extends": [
+    "eslint:recommended",
+    "plugin:react/recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:react-hooks/recommended",
+    "@feature-sliced/eslint-config/rules/import-order",
+    "@feature-sliced/eslint-config/rules/public-api/lite",
+    "@feature-sliced/eslint-config/rules/layers-slices",
+    "prettier"
+  ],
+  "overrides": [],
+  "parser": "@typescript-eslint/parser",
+  "settings": {
+    "import/resolver": {
+      "typescript": {
+        "alwaysTryTypes": true
+      }
+    }
+  },
+  "parserOptions": {
+    "ecmaVersion": "latest",
+    "sourceType": "module"
+  },
+  "plugins": ["react", "react-refresh", "@typescript-eslint", "react-hooks"],
+  "rules": {
+    "react-refresh/only-export-components": "warn",
+    "react/react-in-jsx-scope": "off",
+    "react/no-children-prop": "off",
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": "off",
+    "import/no-internal-modules": [
+      "error",
+      {
+        "allow": [
+          "**/assets/**",
+          "@shared/libs/**",
+          "@shared/types/**",
+          "@mui/**",
+          "**/zustand/**",
+          "**/date-fns/*",
+          "**react-dom/*",
+          "**shared/i18n*",
+          "react-simple-keyboard/**",
+          "@hookform/**",
+          "react-toastify/**"
+        ]
+      }
+    ],
+    "no-debugger": "off",
+    "newline-before-return": "warn",
+    "curly": "warn"
+  }
+}

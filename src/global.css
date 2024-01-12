@@ -1,0 +1,10 @@
+.first-letter-uppercase::first-letter {
+  text-transform: uppercase;
+}
+
+ul,
+ol,
+li {
+  margin: 0;
+  padding: 0;
+}
