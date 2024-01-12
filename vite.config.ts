@@ -1,6 +1,6 @@
-import react from '@vitejs/plugin-react'
 import dns from 'dns'
 import path from 'path'
+import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
 import svgr from 'vite-plugin-svgr'
 
@@ -10,9 +10,6 @@ const mainPath = './src/'
 
 export default defineConfig({
   plugins: [svgr(), react()],
-  optimizeDeps: {
-    include: ['@mui/material'],
-  },
   resolve: {
     alias: {
       '@app': `${path.resolve(__dirname, `${mainPath}app/`)}`,
