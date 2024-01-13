@@ -1,12 +1,12 @@
 import type http from 'http'
 
-import { API_URL } from '@shared/constants'
+import { API_KEY, API_URL } from '@shared/constants'
 import {
   ApiError,
-  isExtendedError,
   PermissionError,
-  unknownToError,
   ValidationError,
+  isExtendedError,
+  unknownToError,
 } from '@shared/core'
 import { pause } from '@shared/helpers'
 import { IRequestOptions, IRequestResponse } from './../types'
@@ -38,7 +38,7 @@ export default async function api<T>(
   headers?: http.OutgoingHttpHeaders
 ): Promise<[T, Headers]> | never {
   try {
-    const apiUrl = options?.customUrl ? '' : API_URL
+    const apiUrl = options?.customUrl ? '' : `${API_URL}v1/${API_KEY}/`
 
     const isNeedStringify = () => {
       if (options?.body && options?.method !== 'GET') {
