@@ -1,11 +1,14 @@
 import { Fragment } from 'react'
 import { Outlet, ScrollRestoration } from 'react-router-dom'
+import { ErrorProvider } from '@shared/core'
 
 export function MainLayout() {
   return (
-    <Fragment>
-      <ScrollRestoration />
-      <Outlet />
-    </Fragment>
+    <ErrorProvider error={null}>
+      <Fragment>
+        <ScrollRestoration />
+        <Outlet />
+      </Fragment>
+    </ErrorProvider>
   )
 }

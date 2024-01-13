@@ -1,8 +1,7 @@
 import { Fragment } from 'react'
 import { ToastContainer } from 'react-toastify'
-import { RouterViewer } from './router'
-
 import 'react-toastify/dist/ReactToastify.min.css'
+import { RouterViewer } from './router'
 
 export function RootProvider() {
   return (
