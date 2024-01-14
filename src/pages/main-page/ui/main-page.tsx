@@ -1,12 +1,12 @@
 import { Fragment } from 'react'
 import { toast } from 'react-toastify'
 
-import { useLesson } from '@entities/lesson'
+import { usePupil } from '@entities/pupil'
 import { useError } from '@shared/core'
 
 export function MainPage() {
   const { bug } = useError()
-  const { getLessons } = useLesson()
+  const { getPupilList } = usePupil()
 
   const notify = () => toast('Wow so easy !')
 
@@ -17,7 +17,7 @@ export function MainPage() {
   const bugHandler = () => bug('Error')
 
   const getData = async () => {
-    const res = await getLessons()
+    const res = await getPupilList()
     console.log('res', res)
   }
 

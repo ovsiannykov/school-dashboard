@@ -2,6 +2,7 @@ import { Fragment } from 'react'
 import { Outlet, ScrollRestoration } from 'react-router-dom'
 
 import { LessonProvider } from '@entities/lesson'
+import { PupilProvider } from '@entities/pupil'
 import { ApiProvider, ErrorProvider } from '@shared/core'
 
 export function MainLayout(): JSX.Element {
@@ -9,10 +10,12 @@ export function MainLayout(): JSX.Element {
     <ErrorProvider error={null}>
       <ApiProvider>
         <LessonProvider>
-          <Fragment>
-            <ScrollRestoration />
-            <Outlet />
-          </Fragment>
+          <PupilProvider>
+            <Fragment>
+              <ScrollRestoration />
+              <Outlet />
+            </Fragment>
+          </PupilProvider>
         </LessonProvider>
       </ApiProvider>
     </ErrorProvider>
