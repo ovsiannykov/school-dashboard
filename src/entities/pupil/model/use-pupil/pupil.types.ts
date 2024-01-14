@@ -9,3 +9,15 @@ export interface IPupil {
   SecondName: string
   LastName: string
 }
+
+export interface IVisitsResponse {
+  Items: IVisitsList[]
+  Quantity: number
+}
+
+export interface IVisitsList {
+  Id: number
+  Title: string
+  SchoolboyId: number
+  ColumnId: string
+}

@@ -17,8 +17,8 @@ export function MainPage() {
   const bugHandler = () => bug('Error')
 
   const getData = async () => {
-    const res = await getPupilList()
-    console.log('res', res)
+    const pupils = await getPupilList()
+    console.log(pupils)
   }
 
   return (

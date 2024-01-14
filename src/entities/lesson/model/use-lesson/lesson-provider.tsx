@@ -6,7 +6,7 @@ import { ILesson, ILessonResponse } from './lesson.types'
 
 interface ILessonContext {
   lessons: ILesson[]
-  getLessons: () => Promise<void | ILesson[]>
+  getLessons: () => Promise<ILesson[] | undefined>
   lessonsLoading: boolean
 }
 
@@ -32,6 +32,8 @@ export const LessonProvider = ({ children }: iProps) => {
 
       if (lessonsError || !lessonsColumn) {
         bug('Упсс... Не удалось получить список уроков')
+
+        return undefined
       }
 
       return lessonsColumn?.Items || []
