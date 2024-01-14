@@ -30,6 +30,7 @@ export const ErrorProvider = ({ children }: IErrorProviderProps) => {
         message: '404',
         stack: event.error.stack,
       })
+      // #Todo: добавить логирование ошибки
     }
 
     window.addEventListener('error', errorHandler)
@@ -48,6 +49,7 @@ export const ErrorProvider = ({ children }: IErrorProviderProps) => {
   const bug = (rawError: unknown) => {
     const error = unknownToError(rawError)
     toast.error(error.message)
+    // #Todo: добавить логирование ошибки
   }
 
   const fatal = (rawError: unknown) => {
