@@ -1,5 +1,5 @@
 import to from 'await-to-js'
-import { ReactNode, createContext, useContext, useRef } from 'react'
+import { ReactNode, createContext, useContext, useState } from 'react'
 
 import { useApi, useError } from '@shared/core'
 import {
@@ -33,13 +33,13 @@ const pupilContext = createContext<IPupilContext>(undefined!)
 export const PupilProvider = ({ children }: iProps) => {
   const { bug } = useError()
   const { api } = useApi()
-  const pupilListRef = useRef<IPupil[]>([])
-  const visitsListRef = useRef<IVisitsList[]>([])
-  const getLoadingRef = useRef<boolean>(false)
-  const postLoadingRef = useRef<boolean>(false)
+  const [pupilList, setPupilList] = useState<IPupil[]>([])
+  const [visitsList, setVisitsList] = useState<IVisitsList[]>([])
+  const [getLoading, setGetLoading] = useState(false)
+  const [postLoading, setPostLoading] = useState(false)
 
   const getPupilList = async () => {
-    getLoadingRef.current = true
+    setGetLoading(true)
 
     try {
       const [pupilListError, pupilList] = await to(
@@ -52,11 +52,13 @@ export const PupilProvider = ({ children }: iProps) => {
         return undefined
       }
 
+      setPupilList(pupilList.Items)
+
       return pupilList?.Items || []
     } catch (error) {
       throw new Error(`${error}`)
     } finally {
-      getLoadingRef.current = false
+      setGetLoading(false)
     }
   }
 
@@ -67,7 +69,7 @@ export const PupilProvider = ({ children }: iProps) => {
       return undefined
     }
 
-    getLoadingRef.current = true
+    setGetLoading(true)
 
     try {
       const [visitsListError, visitsList] = await to(
@@ -80,11 +82,13 @@ export const PupilProvider = ({ children }: iProps) => {
         return undefined
       }
 
+      setVisitsList(visitsList.Items)
+
       return visitsList?.Items || []
     } catch (error) {
       throw new Error(`${error}`)
     } finally {
-      getLoadingRef.current = false
+      setGetLoading(false)
     }
   }
 
@@ -93,7 +97,7 @@ export const PupilProvider = ({ children }: iProps) => {
       return bug(ADD_PASS_ERROR_MSG)
     }
 
-    postLoadingRef.current = true
+    setPostLoading(true)
 
     const body = {
       SchoolboyId: pupilId,
@@ -115,7 +119,7 @@ export const PupilProvider = ({ children }: iProps) => {
     } catch (error) {
       throw new Error(`${error}`)
     } finally {
-      postLoadingRef.current = false
+      setPostLoading(false)
     }
   }
 
@@ -124,7 +128,7 @@ export const PupilProvider = ({ children }: iProps) => {
       return bug(DELETE_PASS_ERROR_MSG)
     }
 
-    postLoadingRef.current = true
+    setPostLoading(true)
 
     const body = {
       SchoolboyId: pupilId,
@@ -145,19 +149,19 @@ export const PupilProvider = ({ children }: iProps) => {
     } catch (error) {
       throw new Error(`${error}`)
     } finally {
-      postLoadingRef.current = false
+      setPostLoading(false)
     }
   }
 
   const contextValue: IPupilContext = {
-    pupilList: pupilListRef.current,
+    pupilList,
     getPupilList,
-    visitsList: visitsListRef.current,
+    visitsList,
     getVisitsList,
     addVisitPass,
     deleteVisitPass,
-    getLoading: getLoadingRef.current,
-    postLoafing: postLoadingRef.current,
+    getLoading,
+    postLoading,
   }
 
   return (

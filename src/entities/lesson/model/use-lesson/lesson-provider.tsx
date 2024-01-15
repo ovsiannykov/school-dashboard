@@ -1,5 +1,5 @@
 import to from 'await-to-js'
-import { ReactNode, createContext, useContext, useRef } from 'react'
+import { ReactNode, createContext, useContext, useState } from 'react'
 
 import { useApi, useError } from '@shared/core'
 import { ILesson, ILessonResponse } from './lesson.types'
@@ -19,11 +19,11 @@ const lessonContext = createContext<ILessonContext>(undefined!)
 export const LessonProvider = ({ children }: iProps) => {
   const { bug } = useError()
   const { api } = useApi()
-  const lessonsRef = useRef<ILesson[]>([])
-  const getLessonsLoadingRef = useRef<boolean>(false)
+  const [lessons, setLessons] = useState<ILesson[]>([])
+  const [lessonsLoading, setLessonsLoading] = useState(false)
 
   const getLessons = async () => {
-    getLessonsLoadingRef.current = true
+    setLessonsLoading(true)
 
     try {
       const [lessonsError, lessonsColumn] = await to(
@@ -36,18 +36,20 @@ export const LessonProvider = ({ children }: iProps) => {
         return undefined
       }
 
+      setLessons(lessonsColumn.Items)
+
       return lessonsColumn?.Items || []
     } catch (error) {
       throw new Error(`${error}`)
     } finally {
-      getLessonsLoadingRef.current = false
+      setLessonsLoading(false)
     }
   }
 
   const contextValue: ILessonContext = {
-    lessons: lessonsRef.current,
+    lessons,
     getLessons,
-    lessonsLoading: getLessonsLoadingRef.current,
+    lessonsLoading,
   }
 
   return (
