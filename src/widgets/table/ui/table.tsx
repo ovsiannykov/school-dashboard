@@ -8,10 +8,12 @@ import {
 import { useEffect, useState } from 'react'
 
 import { useLesson } from '@entities/lesson'
-import { IPupil, IVisit, usePupil } from '@entities/pupil'
+import { IPupil, IVisitsList, usePupil } from '@entities/pupil'
+import { useError } from '@shared/core'
 import { StyledTableCell, StyledTableRow } from './components'
 
 export const TableWidget = () => {
+  const { fatal } = useError()
   const {
     pupilList,
     getPupilList,
@@ -20,12 +22,23 @@ export const TableWidget = () => {
     deleteVisitPass,
   } = usePupil()
   const { lessons, getLessons } = useLesson()
-
-  const [visits, setVisits] = useState<IVisit[]>([])
+  const [visits, setVisits] = useState<Record<string, IVisitsList[]>>({})
 
   const getData = async () => {
     await getPupilList()
     await getLessons()
+  }
+
+  const fetchVisits = async () => {
+    for (const pupil of pupilList) {
+      const pupilVisits = await getVisitsList(pupil.Id)
+      setVisits((prevVisits) => {
+        return {
+          ...prevVisits,
+          [pupil.Id.toString()]: pupilVisits || [], // Handle the possibility of pupilVisits being undefined
+        }
+      })
+    }
   }
 
   useEffect(() => {
@@ -33,40 +46,38 @@ export const TableWidget = () => {
   }, [])
 
   useEffect(() => {
-    const fetchVisits = async () => {
-      for (const pupil of pupilList) {
-        const pupilVisits = await getVisitsList(pupil.Id)
-        setVisits((prevVisits) => ({
-          ...prevVisits,
-          [pupil.Id.toString()]: pupilVisits,
-        }))
-      }
-    }
-
     if (pupilList.length) {
       fetchVisits()
     }
   }, [pupilList])
 
+  const updateAllVisits = async (pupilId: number) => {
+    const updatedVisits = await getVisitsList(pupilId)
+    setVisits(
+      (prevVisits) =>
+        ({
+          ...prevVisits,
+          [pupilId.toString()]: updatedVisits,
+        }) as Record<string, IVisitsList[]>
+    )
+  }
+
   const handleAddVisitPass = async (pupilId: number, columnId: number) => {
-    await addVisitPass(pupilId, columnId)
-    setVisits((prevVisits) => ({
-      ...prevVisits,
-      [pupilId.toString()]: [
-        ...(prevVisits[pupilId.toString()] || []),
-        { Id: 0, Title: 'Н', SchoolboyId: pupilId, ColumnId: columnId },
-      ],
-    }))
+    try {
+      await addVisitPass(pupilId, columnId)
+      updateAllVisits(pupilId)
+    } catch (error) {
+      fatal('Failed to add visit')
+    }
   }
 
   const handleDeleteVisitPass = async (pupilId: number, columnId: number) => {
-    await deleteVisitPass(pupilId, columnId)
-    setVisits((prevVisits) => ({
-      ...prevVisits,
-      [pupilId.toString()]: (prevVisits[pupilId.toString()] || []).filter(
-        (visit) => visit.ColumnId !== columnId
-      ),
-    }))
+    try {
+      await deleteVisitPass(pupilId, columnId)
+      updateAllVisits(pupilId)
+    } catch (error) {
+      fatal('Failed to delete visit')
+    }
   }
 
   return (
@@ -87,21 +98,22 @@ export const TableWidget = () => {
               <StyledTableCell>{pupil.Id}</StyledTableCell>
               <StyledTableCell>{`${pupil.LastName || ''} ${pupil.FirstName || ''} ${pupil.SecondName || ''}`}</StyledTableCell>
               {lessons.map((lesson) => {
-                const visit = (visits[pupil.Id.toString()] || []).find(
-                  (v) => v.ColumnId === lesson.Id
-                )
+                const visit = (
+                  (visits[pupil.Id.toString()] || []) as IVisitsList[]
+                ).find((v) => v.ColumnId.toString() === lesson.Id.toString())
 
                 return (
-                  <StyledTableCell key={lesson.Id}>
-                    <span
-                      onClick={() =>
-                        visit
-                          ? handleDeleteVisitPass(pupil.Id, lesson.Id)
-                          : handleAddVisitPass(pupil.Id, lesson.Id)
-                      }
-                    >
-                      <p>{visit ? visit.Title : ' '}</p>
-                    </span>
+                  <StyledTableCell
+                    key={lesson.Id}
+                    onClick={() =>
+                      visit
+                        ? handleDeleteVisitPass(pupil.Id, lesson.Id)
+                        : handleAddVisitPass(pupil.Id, lesson.Id)
+                    }
+                  >
+                    <div>
+                      <p>{visit ? visit.Title : '    '}</p>
+                    </div>
                   </StyledTableCell>
                 )
               })}
