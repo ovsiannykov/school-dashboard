@@ -5,9 +5,9 @@ export interface IPupilResponse {
 
 export interface IPupil {
   Id: number
-  FirstName: string
-  SecondName: string
-  LastName: string
+  FirstName: string | null
+  SecondName: string | null
+  LastName: string | null
 }
 
 export interface IVisitsResponse {
