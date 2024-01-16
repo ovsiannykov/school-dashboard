@@ -3,16 +3,14 @@ import Container from '@mui/material/Container'
 import Toolbar from '@mui/material/Toolbar'
 import Typography from '@mui/material/Typography'
 import { Link } from 'react-router-dom'
+import { appBarStyles, logoLinkStyles } from './header.styles'
 
 export const Header = () => {
   return (
-    <AppBar
-      position="static"
-      sx={{ marginBottom: '20px', backgroundColor: 'black' }}
-    >
+    <AppBar position="static" sx={appBarStyles}>
       <Container maxWidth="xl">
         <Toolbar disableGutters>
-          <Link to="/" style={{ textDecoration: 'none', color: 'inherit' }}>
+          <Link to="/" style={logoLinkStyles}>
             <Typography
               variant="h6"
               noWrap

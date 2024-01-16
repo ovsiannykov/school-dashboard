@@ -12,7 +12,7 @@ import {
 
 interface IPupilContext {
   pupilList: IPupil[]
-  getPupilList: () => Promise<IPupil[] | undefined>
+  getPupilList: () => Promise<void | IPupil[]>
   getVisitsList: (pupilId: number) => Promise<IVisitsList[] | undefined>
   addVisitPass: (pupilId: number, columnId: number) => Promise<void>
   deleteVisitPass: (pupilId: number, columnId: number) => Promise<void>
@@ -131,7 +131,9 @@ export const PupilProvider = ({ children }: iProps) => {
           return bug(DELETE_PASS_ERROR_MSG)
         }
 
-        return toast.success(VISIT_UPDATED)
+        toast.success(VISIT_UPDATED)
+
+        return
       }
 
       toast.success(VISIT_UPDATED)
@@ -169,7 +171,9 @@ export const PupilProvider = ({ children }: iProps) => {
           return bug(DELETE_PASS_ERROR_MSG)
         }
 
-        return toast.success(VISIT_UPDATED)
+        toast.success(VISIT_UPDATED)
+
+        return
       }
 
       toast.success(VISIT_UPDATED)

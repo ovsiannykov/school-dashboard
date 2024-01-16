@@ -12,6 +12,7 @@ import { useLesson } from '@entities/lesson'
 import { IPupil, IVisitsList, usePupil } from '@entities/pupil'
 import { useError } from '@shared/core'
 import { StyledTableCell, StyledTableRow } from './components'
+import { circularStyles, tableRotStyles } from './table.styles'
 
 export const TableWidget = () => {
   const { fatal } = useError()
@@ -25,6 +26,9 @@ export const TableWidget = () => {
   } = usePupil()
   const { lessons, getLessons, lessonsLoading } = useLesson()
   const [visits, setVisits] = useState<Record<string, IVisitsList[]>>({})
+  const [isFirstLoading, setIsFirstLoading] = useState(true)
+  const firstLoading =
+    (isFirstLoading && getLoading) || (isFirstLoading && lessonsLoading)
 
   const getData = async () => {
     await getPupilList()
@@ -79,27 +83,14 @@ export const TableWidget = () => {
   useEffect(() => {
     if (pupilList.length) {
       fetchVisits()
+      setIsFirstLoading(false)
     }
   }, [pupilList])
 
   return (
-    <div
-      style={{
-        overflow: 'auto',
-        height: '80vh',
-        border: '0.3px solid black',
-      }}
-    >
-      {getLoading || lessonsLoading ? (
-        <CircularProgress
-          style={{
-            position: 'absolute',
-            color: 'black',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-          }}
-        />
+    <div style={tableRotStyles}>
+      {firstLoading ? (
+        <CircularProgress style={circularStyles} />
       ) : (
         <TableContainer component={Paper}>
           <Table>
