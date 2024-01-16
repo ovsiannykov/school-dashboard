@@ -41,16 +41,6 @@ export const TableWidget = () => {
     }
   }
 
-  useEffect(() => {
-    getData()
-  }, [])
-
-  useEffect(() => {
-    if (pupilList.length) {
-      fetchVisits()
-    }
-  }, [pupilList])
-
   const updateAllVisits = async (pupilId: number) => {
     const updatedVisits = await getVisitsList(pupilId)
     setVisits(
@@ -79,6 +69,16 @@ export const TableWidget = () => {
       fatal('Failed to delete visit')
     }
   }
+
+  useEffect(() => {
+    getData()
+  }, [])
+
+  useEffect(() => {
+    if (pupilList.length) {
+      fetchVisits()
+    }
+  }, [pupilList])
 
   return (
     <TableContainer component={Paper}>
