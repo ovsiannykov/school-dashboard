@@ -2,9 +2,77 @@
   text-transform: uppercase;
 }
 
+*,
+*::before,
+*::after {
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+}
+body,
+h1,
+h2,
+h3,
+h4,
+p,
 ul,
 ol,
-li {
+li,
+figure,
+figcaption,
+blockquote,
+dl,
+dd,
+ul,
+ol {
   margin: 0;
   padding: 0;
+}
+html {
+  scroll-behavior: smooth;
+}
+body {
+  overflow-x: hidden;
+}
+h2 {
+  line-height: 32px;
+}
+ul,
+ol {
+  list-style: none;
+}
+a {
+  text-decoration: none;
+  color: inherit;
+}
+p {
+  cursor: default;
+}
+img {
+  max-width: 100%;
+  display: block;
+}
+
+input {
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+article > * + * {
+  margin-top: 1em;
+}
+input,
+button,
+textarea,
+select {
+  font: inherit;
+  background-color: transparent;
+  border: none;
+  outline: none;
+}
+button {
+  cursor: pointer;
+}
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
 }

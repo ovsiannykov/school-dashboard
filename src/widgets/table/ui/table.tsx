@@ -1,4 +1,5 @@
 import {
+  CircularProgress,
   Paper,
   Table,
   TableBody,
@@ -20,8 +21,9 @@ export const TableWidget = () => {
     getVisitsList,
     addVisitPass,
     deleteVisitPass,
+    getLoading,
   } = usePupil()
-  const { lessons, getLessons } = useLesson()
+  const { lessons, getLessons, lessonsLoading } = useLesson()
   const [visits, setVisits] = useState<Record<string, IVisitsList[]>>({})
 
   const getData = async () => {
@@ -81,46 +83,70 @@ export const TableWidget = () => {
   }, [pupilList])
 
   return (
-    <TableContainer component={Paper}>
-      <Table>
-        <TableHead>
-          <StyledTableRow>
-            <StyledTableCell>Id</StyledTableCell>
-            <StyledTableCell>Ученик</StyledTableCell>
-            {lessons.map((lesson) => (
-              <StyledTableCell key={lesson.Id}>{lesson.Title}</StyledTableCell>
-            ))}
-          </StyledTableRow>
-        </TableHead>
-        <TableBody>
-          {pupilList.map((pupil: IPupil) => (
-            <StyledTableRow key={pupil.Id}>
-              <StyledTableCell>{pupil.Id}</StyledTableCell>
-              <StyledTableCell>{`${pupil.LastName || ''} ${pupil.FirstName || ''} ${pupil.SecondName || ''}`}</StyledTableCell>
-              {lessons.map((lesson) => {
-                const visit = (
-                  (visits[pupil.Id.toString()] || []) as IVisitsList[]
-                ).find((v) => v.ColumnId.toString() === lesson.Id.toString())
-
-                return (
-                  <StyledTableCell
-                    key={lesson.Id}
-                    onClick={() =>
-                      visit
-                        ? handleDeleteVisitPass(pupil.Id, lesson.Id)
-                        : handleAddVisitPass(pupil.Id, lesson.Id)
-                    }
-                  >
-                    <div>
-                      <p>{visit ? visit.Title : '    '}</p>
-                    </div>
+    <div
+      style={{
+        overflow: 'auto',
+        height: '80vh',
+        border: '0.3px solid black',
+      }}
+    >
+      {getLoading || lessonsLoading ? (
+        <CircularProgress
+          style={{
+            position: 'absolute',
+            color: 'black',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+          }}
+        />
+      ) : (
+        <TableContainer component={Paper}>
+          <Table>
+            <TableHead>
+              <StyledTableRow>
+                <StyledTableCell>Id</StyledTableCell>
+                <StyledTableCell>Ученик</StyledTableCell>
+                {lessons.map((lesson) => (
+                  <StyledTableCell key={lesson.Id}>
+                    {lesson.Title}
                   </StyledTableCell>
-                )
-              })}
-            </StyledTableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
+                ))}
+              </StyledTableRow>
+            </TableHead>
+            <TableBody>
+              {pupilList.map((pupil: IPupil) => (
+                <StyledTableRow key={pupil.Id}>
+                  <StyledTableCell>{pupil.Id}</StyledTableCell>
+                  <StyledTableCell>{`${pupil.LastName || ''} ${pupil.FirstName || ''} ${pupil.SecondName || ''}`}</StyledTableCell>
+                  {lessons.map((lesson) => {
+                    const visit = (
+                      (visits[pupil.Id.toString()] || []) as IVisitsList[]
+                    ).find(
+                      (v) => v.ColumnId.toString() === lesson.Id.toString()
+                    )
+
+                    return (
+                      <StyledTableCell
+                        key={lesson.Id}
+                        onClick={() =>
+                          visit
+                            ? handleDeleteVisitPass(pupil.Id, lesson.Id)
+                            : handleAddVisitPass(pupil.Id, lesson.Id)
+                        }
+                      >
+                        <div>
+                          <p>{visit ? visit.Title : '    '}</p>
+                        </div>
+                      </StyledTableCell>
+                    )
+                  })}
+                </StyledTableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      )}
+    </div>
   )
 }
