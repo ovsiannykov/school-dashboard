@@ -93,21 +93,15 @@ export const TableWidget = () => {
 
                 return (
                   <StyledTableCell key={lesson.Id}>
-                    {visit ? (
-                      <span
-                        onClick={() =>
-                          handleDeleteVisitPass(pupil.Id, lesson.Id)
-                        }
-                      >
-                        <p>{visit.Title}</p>
-                      </span>
-                    ) : (
-                      <span
-                        onClick={() => handleAddVisitPass(pupil.Id, lesson.Id)}
-                      >
-                        {''}
-                      </span>
-                    )}
+                    <span
+                      onClick={() =>
+                        visit
+                          ? handleDeleteVisitPass(pupil.Id, lesson.Id)
+                          : handleAddVisitPass(pupil.Id, lesson.Id)
+                      }
+                    >
+                      <p>{visit ? visit.Title : ' '}</p>
+                    </span>
                   </StyledTableCell>
                 )
               })}

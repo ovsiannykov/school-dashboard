@@ -1,7 +1,8 @@
 import to from 'await-to-js'
 import { ReactNode, createContext, useContext, useState } from 'react'
+import { toast } from 'react-toastify'
 
-import { useApi, useError } from '@shared/core'
+import { IRequestError, useApi, useError } from '@shared/core'
 import {
   IPupil,
   IPupilResponse,
@@ -26,6 +27,8 @@ interface iProps {
 const GET_VISITS_ERROR_MSG = 'Упсс... Не удалось получить список посещений'
 const ADD_PASS_ERROR_MSG = 'Упсс, не удалось зафиксировать пропуск'
 const DELETE_PASS_ERROR_MSG = 'Упсс, не удалось удалить пропуск'
+const VISIT_UPDATED = 'Посещение обновленно'
+const FILED_TO_GET_PUPILS = 'Упсс... Не удалось получить список учеников'
 
 const pupilContext = createContext<IPupilContext>(undefined!)
 
@@ -44,10 +47,18 @@ export const PupilProvider = ({ children }: iProps) => {
         api<IPupilResponse>('Schoolboy')
       )
 
-      if (pupilListError || !pupilList) {
-        bug('Упсс... Не удалось получить список учеников')
+      if (pupilListError && 'payload' in pupilListError) {
+        const payload = pupilListError.payload as IRequestError
 
-        return undefined
+        if (payload.code !== 200) {
+          bug(FILED_TO_GET_PUPILS)
+
+          return undefined
+        }
+      }
+
+      if (!pupilList) {
+        return bug(FILED_TO_GET_PUPILS)
       }
 
       setPupilList(pupilList.Items)
@@ -74,10 +85,14 @@ export const PupilProvider = ({ children }: iProps) => {
         api<IVisitsResponse>(`Rate?SchoolboyId=${pupilId}`)
       )
 
-      if (visitsListError || !visitsList) {
-        bug(GET_VISITS_ERROR_MSG)
+      if (visitsListError && 'payload' in visitsListError) {
+        const payload = visitsListError.payload as IRequestError
 
-        return undefined
+        if (payload.code !== 200) {
+          bug(DELETE_PASS_ERROR_MSG)
+
+          return undefined
+        }
       }
 
       return visitsList?.Items || []
@@ -102,16 +117,24 @@ export const PupilProvider = ({ children }: iProps) => {
     }
 
     try {
-      const [error] = await to(
+      const [rateError] = await to(
         api('Rate', {
           method: 'POST',
           body,
         })
       )
 
-      if (error) {
-        return bug(ADD_PASS_ERROR_MSG)
+      if (rateError && 'payload' in rateError) {
+        const payload = rateError.payload as IRequestError
+
+        if (payload.code !== 200) {
+          return bug(DELETE_PASS_ERROR_MSG)
+        }
+
+        return toast.success(VISIT_UPDATED)
       }
+
+      toast.success(VISIT_UPDATED)
     } catch (error) {
       throw new Error(`${error}`)
     } finally {
@@ -132,20 +155,24 @@ export const PupilProvider = ({ children }: iProps) => {
     }
 
     try {
-      const [UnRateError, UnRateRequest] = await to(
+      const [unRateError] = await to(
         api('UnRate', {
           method: 'POST',
           body,
         })
       )
 
-      console.log('UnRateRequest', UnRateRequest)
+      if (unRateError && 'payload' in unRateError) {
+        const payload = unRateError.payload as IRequestError
 
-      if (UnRateError && 'payload' in UnRateError) {
-        console.log('error', UnRateError.payload)
+        if (payload.code !== 200) {
+          return bug(DELETE_PASS_ERROR_MSG)
+        }
 
-        return bug(DELETE_PASS_ERROR_MSG)
+        return toast.success(VISIT_UPDATED)
       }
+
+      toast.success(VISIT_UPDATED)
     } catch (error) {
       throw new Error(`${error}`)
     } finally {
