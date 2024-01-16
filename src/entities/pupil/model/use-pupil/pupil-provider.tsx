@@ -12,12 +12,11 @@ import {
 interface IPupilContext {
   pupilList: IPupil[]
   getPupilList: () => Promise<IPupil[] | undefined>
-  visitsList: IVisitsList[]
   getVisitsList: (pupilId: number) => Promise<IVisitsList[] | undefined>
   addVisitPass: (pupilId: number, columnId: number) => Promise<void>
   deleteVisitPass: (pupilId: number, columnId: number) => Promise<void>
   getLoading: boolean
-  postLoafing: boolean
+  postLoading: boolean
 }
 
 interface iProps {
@@ -34,7 +33,6 @@ export const PupilProvider = ({ children }: iProps) => {
   const { bug } = useError()
   const { api } = useApi()
   const [pupilList, setPupilList] = useState<IPupil[]>([])
-  const [visitsList, setVisitsList] = useState<IVisitsList[]>([])
   const [getLoading, setGetLoading] = useState(false)
   const [postLoading, setPostLoading] = useState(false)
 
@@ -81,8 +79,6 @@ export const PupilProvider = ({ children }: iProps) => {
 
         return undefined
       }
-
-      setVisitsList(visitsList.Items)
 
       return visitsList?.Items || []
     } catch (error) {
@@ -136,14 +132,18 @@ export const PupilProvider = ({ children }: iProps) => {
     }
 
     try {
-      const [error] = await to(
+      const [UnRateError, UnRateRequest] = await to(
         api('UnRate', {
           method: 'POST',
           body,
         })
       )
 
-      if (error) {
+      console.log('UnRateRequest', UnRateRequest)
+
+      if (UnRateError && 'payload' in UnRateError) {
+        console.log('error', UnRateError.payload)
+
         return bug(DELETE_PASS_ERROR_MSG)
       }
     } catch (error) {
@@ -156,7 +156,6 @@ export const PupilProvider = ({ children }: iProps) => {
   const contextValue: IPupilContext = {
     pupilList,
     getPupilList,
-    visitsList,
     getVisitsList,
     addVisitPass,
     deleteVisitPass,

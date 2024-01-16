@@ -2,67 +2,71 @@ import {
   Paper,
   Table,
   TableBody,
-  TableCell,
   TableContainer,
   TableHead,
-  TableRow,
-  styled,
 } from '@mui/material'
-import { Theme } from '@mui/system'
-import { useCallback, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
 import { useLesson } from '@entities/lesson'
-import { IPupil, usePupil } from '@entities/pupil'
-
-const StyledTableCell = styled(TableCell)(({ theme }: { theme: Theme }) => ({
-  //backgroundColor: theme.palette.primary.main,
-  //color: theme.palette.common.white,
-  border: `1px solid ${theme.palette.common.black}`,
-  fontSize: 14,
-  '&:first-of-type': {
-    width: '50px', // Set the width of the first cell if needed
-  },
-}))
-
-const StyledTableRow = styled(TableRow)({
-  '&:nth-of-type(odd)': {
-    backgroundColor: '#f3f3f3', // Set the background color for odd rows if needed
-  },
-})
+import { IPupil, IVisit, usePupil } from '@entities/pupil'
+import { StyledTableCell, StyledTableRow } from './components'
 
 export const TableWidget = () => {
   const {
     pupilList,
     getPupilList,
-    visitsList,
     getVisitsList,
     addVisitPass,
     deleteVisitPass,
-    //   getLoading,
-    // postLoafing,
   } = usePupil()
   const { lessons, getLessons } = useLesson()
 
-  console.log('lessons', lessons)
+  const [visits, setVisits] = useState<IVisit[]>([])
 
-  const getData = useCallback(async () => {
+  const getData = async () => {
     await getPupilList()
-    // await getVisitsList(1) // (pupilId: number) => Promise<IVisitsList[] | undefined>
     await getLessons()
-  }, [])
+  }
 
   useEffect(() => {
     getData()
   }, [])
 
+  useEffect(() => {
+    const fetchVisits = async () => {
+      for (const pupil of pupilList) {
+        const pupilVisits = await getVisitsList(pupil.Id)
+        setVisits((prevVisits) => ({
+          ...prevVisits,
+          [pupil.Id.toString()]: pupilVisits,
+        }))
+      }
+    }
+
+    if (pupilList.length) {
+      fetchVisits()
+    }
+  }, [pupilList])
+
   const handleAddVisitPass = async (pupilId: number, columnId: number) => {
     await addVisitPass(pupilId, columnId)
-    getVisitsList(pupilId)
+    setVisits((prevVisits) => ({
+      ...prevVisits,
+      [pupilId.toString()]: [
+        ...(prevVisits[pupilId.toString()] || []),
+        { Id: 0, Title: 'Н', SchoolboyId: pupilId, ColumnId: columnId },
+      ],
+    }))
   }
 
   const handleDeleteVisitPass = async (pupilId: number, columnId: number) => {
     await deleteVisitPass(pupilId, columnId)
-    getVisitsList(pupilId)
+    setVisits((prevVisits) => ({
+      ...prevVisits,
+      [pupilId.toString()]: (prevVisits[pupilId.toString()] || []).filter(
+        (visit) => visit.ColumnId !== columnId
+      ),
+    }))
   }
 
   return (
@@ -83,10 +87,8 @@ export const TableWidget = () => {
               <StyledTableCell>{pupil.Id}</StyledTableCell>
               <StyledTableCell>{`${pupil.LastName || ''} ${pupil.FirstName || ''} ${pupil.SecondName || ''}`}</StyledTableCell>
               {lessons.map((lesson) => {
-                const visit = visitsList.find(
-                  (v) =>
-                    v.SchoolboyId === pupil.Id &&
-                    v.ColumnId === lesson.Id.toString()
+                const visit = (visits[pupil.Id.toString()] || []).find(
+                  (v) => v.ColumnId === lesson.Id
                 )
 
                 return (
@@ -97,7 +99,7 @@ export const TableWidget = () => {
                           handleDeleteVisitPass(pupil.Id, lesson.Id)
                         }
                       >
-                        <p>н</p>
+                        <p>{visit.Title}</p>
                       </span>
                     ) : (
                       <span
