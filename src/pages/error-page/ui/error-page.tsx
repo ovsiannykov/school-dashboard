@@ -1,13 +1,10 @@
-import { Typography } from '@mui/material'
 import { useEffect } from 'react'
 
+import { AnimationViewer } from '@features/animation-viewer'
 import { useError } from '@shared/core'
+import { errorContainerStyles } from './error-page.styles'
 
-interface IErrorPage {
-  code?: number
-}
-
-export function ErrorPage({ code }: IErrorPage) {
+export function ErrorPage() {
   const { setError } = useError()
 
   useEffect(() => {
@@ -17,39 +14,8 @@ export function ErrorPage({ code }: IErrorPage) {
   }, [setError])
 
   return (
-    <div
-      style={{
-        width: '100vw',
-        height: '80vh',
-        flexDirection: 'column',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-      }}
-    >
-      <Typography
-        noWrap
-        component="span"
-        sx={{
-          fontWeight: 400,
-          letterSpacing: '.3rem',
-          fontSize: 24,
-        }}
-      >
-        Opps...
-      </Typography>
-
-      <Typography
-        noWrap
-        component="h2"
-        sx={{
-          fontWeight: 700,
-          letterSpacing: '.3rem',
-          fontSize: 90,
-        }}
-      >
-        {code}
-      </Typography>
+    <div style={errorContainerStyles}>
+      <AnimationViewer />
     </div>
   )
 }
